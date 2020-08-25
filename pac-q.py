@@ -22,12 +22,13 @@ blue = (0,0,200)
 #Size of the main character
 pacq_width = 80
 orientation = "r"
+speed = 1
 
 #Global variable with the score
 score = 0
 
 #Map
-mapa = [[0,0,0,0,0,0,0,0],[0,1,1,1,1,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]
+mapa = [[0,0,0,0,0,0,0,0],[0,0,1,1,1,1,0,0],[0,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,0],[0,0,1,0,0,1,0,0],[0,0,1,1,1,1,0,0],[0,0,0,0,0,0,0,0]]
 
 #Set the size of the game area.
 gameDisplay = pygame.display.set_mode((display_width,display_height))
@@ -105,9 +106,40 @@ def message_display(text):
   gameDisplay.blit(TextSurf, TextRect)
   pygame.display.update()
 #  pygame.quit()
-
 #Wait
   time.sleep(2)
+
+def colisionesup(mapas,x,y,xx,yy):
+  for cuadrante in reversed(mapas):
+    if y == cuadrante[3]+1 and x >= cuadrante[0] and x <= cuadrante[1]:
+      return True
+    elif y == cuadrante[3]+1 and xx >= cuadrante[0] and xx <= cuadrante[1]:
+      return True
+  return False
+
+def colisionesd(mapas,x,y,xx,yy):
+  for cuadrante in mapas:
+    if yy == cuadrante[2]+1 and x >= cuadrante[0] and x <= cuadrante[1]:
+      return True
+    elif yy == cuadrante[2]+1 and xx >= cuadrante[0] and xx <= cuadrante[1]:
+      return True
+  return False
+
+def colisionesl(mapas,x,y,xx,yy):
+  for cuadrante in reversed(mapas):
+    if x == cuadrante[1]+1 and y >= cuadrante[2] and y <= cuadrante[3]:
+      return True
+    elif x == cuadrante[1]+1 and yy >= cuadrante[2] and yy <= cuadrante[3]:
+      return True
+  return False
+
+def colisionesr(mapas,x,y,xx,yy):
+  for cuadrante in reversed(mapas):
+    if xx == cuadrante[0]+1 and y >= cuadrante[2] and y <= cuadrante[3]:
+      return True
+    elif xx == cuadrante[0]+1 and yy >= cuadrante[2] and yy <= cuadrante[3]:
+      return True
+  return False
 
 #Game Over!
 def gameover():
@@ -140,11 +172,12 @@ def game_intro():
 
 #GameLogic
 def game_loop():
+  global speed
 #  game_intro()
   global orientation
 #Start position of the character?
-  X = int(display_width * 0.45)
-  Y = int(display_height * 0.8)
+  X = 360
+  Y = 520
 
 #The character movement
   x_change = 0
@@ -172,12 +205,15 @@ def game_loop():
 #Flag to know if the game loop should exit
   gameexit = False
 
+  collisiones = []
 
-#Pintar Mapa
-#for F in range(len(matriz)):
-#    for C in range(len(matriz[0])):
-#        print(matriz[F][C],end = ' ')
-#    print(' ')
+  down_pressed = False
+
+#Armar Mapa
+  for F in range(len(mapa)):
+      for C in range(len(mapa[F])):
+          if mapa[F][C]:
+            collisiones.append(((80*C),((80*C)+80),(80*F),((80*F)+80)))
 
 #PINTAR FONDO
   gameDisplay.fill(grey)
@@ -185,18 +221,14 @@ def game_loop():
   pygame.draw.rect(gameDisplay, blue, [ub_startx, ub_starty, ub_width, ub_height])
   pygame.draw.rect(gameDisplay, blue, [lb_startx, lb_starty, lb_width, lb_height])
 
+#PINTAR MAPA
+  for cuadro in collisiones:
+    pygame.draw.rect(gameDisplay, red, [cuadro[0], cuadro[2], pacq_width, pacq_width])
 
 #LOOP PRINCIPAL DEL JUEGO
 #LOOP PRINCIPAL DEL JUEGO
 #LOOP PRINCIPAL DEL JUEGO
   while not gameexit:
-
-    #Pintar sobre donde estuvieron los characters para que no dejen un trail
-    #    fantasmitas(t_startx, t_starty, t_width, t_height, black)
-    pygame.draw.rect(gameDisplay, grey, [t_startx, t_starty, t_width, t_height])
-    #    character(orientation,int(X),int(Y))
-    pygame.draw.rect(gameDisplay, grey, [int(X), int(Y), (int(X)+80), (int(Y)+80)])
-
 
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
@@ -205,43 +237,68 @@ def game_loop():
 
       if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_LEFT:
-          down_pressed = True
-          x_change = -4
+          #down_pressed = True
+          x_change = (0-speed)
           y_change = 0
           orientation = "l"
         elif event.key == pygame.K_RIGHT:
-          down_pressed = True
-          x_change = 4
+          #down_pressed = True
+          x_change = speed
           y_change = 0
           orientation = "r"
         elif event.key == pygame.K_UP:
-          down_pressed = True
-          y_change = -4
+          #down_pressed = True
+          y_change = (0-speed)
           x_change = 0
           orientation = "u"
         elif event.key == pygame.K_DOWN:
-          down_pressed = True
-          y_change = 4
+          #down_pressed = True
+          y_change = speed
           x_change = 0
           orientation = "d"
 
-      if event.type == pygame.KEYUP:
-        if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-          down_pressed = False
-          x_change = 0
-        elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-          down_pressed = False
-          y_change = 0
+      #if event.type == pygame.KEYUP:
+      #  if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+      #    down_pressed = False
+      #    x_change = 0
+      #  elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+      #    down_pressed = False
+      #    y_change = 0
 
 #AVOID GOING AWAY FROM PLAYING AREA
-    if (X < 100) and down_pressed and orientation == "l":
-      x_change = 0
-    if (X > (display_width - (pacq_width + 3))) and down_pressed and orientation == "r":
-      x_change = 0
-    if (Y < 40) and down_pressed and orientation == "u":
-      y_change = 0
-    if (Y > (display_height - (pacq_width + 3))) and down_pressed and orientation == "d":
-      y_change = 0
+#    if (X < 100) and down_pressed and orientation == "l":
+#      x_change = 0
+#    if (X > (display_width - (pacq_width + 3))) and down_pressed and orientation == "r":
+#      x_change = 0
+#    if (Y < 40) and down_pressed and orientation == "u":
+#      y_change = 0
+#    if (Y > (display_height - (pacq_width + 3))) and down_pressed and orientation == "d":
+#      y_change = 0
+
+    if orientation == "l":
+      if (X <= 101):
+        x_change = 0
+      elif colisionesl(collisiones,X,Y,(X+pacq_width),(Y+pacq_width)):
+        x_change = 0
+    
+    if orientation == "r":
+      if (X >= (display_width - (pacq_width + 3))):
+        x_change = 0
+      elif colisionesr(collisiones,X,Y,(X+pacq_width),(Y+pacq_width)):
+        x_change = 0
+
+    if orientation == "u":
+      if (Y <= 41):
+        y_change = 0
+      elif colisionesup(collisiones,X,Y,(X+pacq_width),(Y+pacq_width)):
+        y_change = 0
+    
+    if orientation == "d":
+      if (Y >= (display_height - (pacq_width + 3))):
+        y_change = 0
+      elif colisionesd(collisiones,X,Y,(X+pacq_width),(Y+pacq_width)):
+        y_change = 0
+
 
     X += x_change
     Y += y_change
@@ -254,14 +311,18 @@ def game_loop():
 
 
 #PINTAR PRIMERO LOS CUADRADOS POR DONDE PASO EL CARACTER, Y LUEGO PINTAR TODOS LOS CARACTERES EN PANTALLA
-
+    #Pintar sobre donde estuvieron los characters para que no dejen un trail
+    #    fantasmitas(t_startx, t_starty, t_width, t_height, black)
+    pygame.draw.rect(gameDisplay, grey, [t_startx, t_starty, t_width, t_height])
+    #    character(orientation,int(X),int(Y))
+    pygame.draw.rect(gameDisplay, grey, [X-1, Y-1, pacq_width, pacq_width])
 #ENEMIGOS
 #Hay que reworkear esto
     fantasmitas(t_startx, t_starty, t_width, t_height, black)
 #    t_starty = t_speed
 
 #DIBUJADO DE PACQ
-    character(orientation,int(X),int(Y))
+    character(orientation,X,Y)
 #    scored(score)
 
 #LOGIC
