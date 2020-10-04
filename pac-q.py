@@ -28,7 +28,7 @@ speed = 1
 score = 0
 
 #Map
-mapa = [[0,0,0,0,0,0,0,0],[0,0,1,1,1,1,0,0],[0,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,0],[0,0,1,0,0,1,0,0],[0,0,1,1,1,1,0,0],[0,0,0,0,0,0,0,0]]
+mapa = [[0,0,0,0,0,0,0,0],[0,0,1,1,1,1,0,0],[0,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,0],[0,0,1,0,0,1,0,0],[0,0,1,1,0,1,0,0],[0,0,0,0,0,0,0,0]]
 
 #Set the size of the game area.
 gameDisplay = pygame.display.set_mode((display_width,display_height))
@@ -213,7 +213,7 @@ def game_loop():
   for F in range(len(mapa)):
       for C in range(len(mapa[F])):
           if mapa[F][C]:
-            collisiones.append(((80*C),((80*C)+80),(80*F),((80*F)+80)))
+            collisiones.append(((90*C),((90*C)+90),(90*F),((90*F)+90)))
 
 #PINTAR FONDO
   gameDisplay.fill(grey)
