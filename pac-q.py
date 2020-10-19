@@ -5,8 +5,8 @@ import random
 pygame.init()
 
 #Size of the game area
-display_width = 800
-display_height = 600
+display_width = 820
+display_height = 660
 
 #Colors for use in backgrounds or buttons
 black = (0,0,0)
@@ -19,7 +19,7 @@ bred = (255,0,0)
 bgreen = (0,255,0)
 blue = (0,0,200)
 
-#Size of the main character
+#Main character
 pacq_width = 80
 orientation = "r"
 speed = 1
@@ -28,7 +28,13 @@ speed = 1
 score = 0
 
 #Map
-mapa = [[0,0,0,0,0,0,0,0],[0,0,1,1,1,1,0,0],[0,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,0],[0,0,1,0,0,1,0,0],[0,0,1,1,0,1,0,0],[0,0,0,0,0,0,0,0]]
+mapa = [[1,0,1,1,1,1,0,1],
+        [0,0,0,0,0,0,0,0],
+        [1,0,1,1,1,1,0,1],
+        [0,0,0,0,0,1,0,0],
+        [1,0,1,0,0,1,0,1],
+        [0,0,1,1,0,1,0,0],
+        [1,0,0,0,0,0,0,1]]
 
 #Set the size of the game area.
 gameDisplay = pygame.display.set_mode((display_width,display_height))
@@ -176,20 +182,19 @@ def game_loop():
 #  game_intro()
   global orientation
 #Start position of the character?
-  X = 360
-  Y = 520
+  X = 0
+  Y = 0
 
 #The character movement
   x_change = 0
   y_change = 0
 
 #Fantasmitas position
-  t_startx = 100
-  t_starty = 100
-  t_speed = 6
-  t_width = 80
-  t_height = 80
-
+  f_startx = 0
+  f_starty = 0
+  f_speed = 3
+  f_width = 80
+  f_height = 80
 
 #Upper and Left Bar.
   ub_startx = 0
@@ -209,11 +214,24 @@ def game_loop():
 
   down_pressed = False
 
+  fantaspos = False
+  Distancia = 0
 #Armar Mapa
   for F in range(len(mapa)):
       for C in range(len(mapa[F])):
           if mapa[F][C]:
-            collisiones.append(((90*C),((90*C)+90),(90*F),((90*F)+90)))
+            collisiones.append(((90*C)+lb_width,((90*C)+90)+lb_width,(90*F)+ub_height,((90*F)+90)+ub_height))
+          else:
+            if not fantaspos:
+              f_startx = (90*C)+lb_width
+              f_starty = (90*F)+ub_height
+              fantaspos = True
+            
+            if Distancia > 3:
+              X = (90*C)+lb_width
+              Y = (90*F)+ub_height
+            
+            Distancia += 1
 
 #PINTAR FONDO
   gameDisplay.fill(grey)
@@ -313,12 +331,12 @@ def game_loop():
 #PINTAR PRIMERO LOS CUADRADOS POR DONDE PASO EL CARACTER, Y LUEGO PINTAR TODOS LOS CARACTERES EN PANTALLA
     #Pintar sobre donde estuvieron los characters para que no dejen un trail
     #    fantasmitas(t_startx, t_starty, t_width, t_height, black)
-    pygame.draw.rect(gameDisplay, grey, [t_startx, t_starty, t_width, t_height])
+    pygame.draw.rect(gameDisplay, grey, [f_startx, f_starty, f_width, f_height])
     #    character(orientation,int(X),int(Y))
     pygame.draw.rect(gameDisplay, grey, [X-1, Y-1, pacq_width, pacq_width])
 #ENEMIGOS
 #Hay que reworkear esto
-    fantasmitas(t_startx, t_starty, t_width, t_height, black)
+    fantasmitas(f_startx, f_starty, f_width, f_height, black)
 #    t_starty = t_speed
 
 #DIBUJADO DE PACQ
